@@ -300,14 +300,19 @@ public class IconProvider {
         }
 
         Drawable loadPaddedDrawable() {
-            if (!"drawable".equals(mResources.getResourceTypeName(mResID))) {
+            try {
+                if (!"drawable".equals(mResources.getResourceTypeName(mResID))) {
+                    return null;
+                }
+                Drawable d = mResources.getDrawable(mResID).mutate();
+                d = new InsetDrawable(d, .2f);
+                float inset = getExtraInsetFraction() / (1 + 2 * getExtraInsetFraction());
+                Drawable fg = new InsetDrawable(d, inset);
+                return fg;
+            } catch (Resources.NotFoundException e) {
+                // Invalid resource ID from a third-party app. Fail gracefully.
                 return null;
             }
-            Drawable d = mResources.getDrawable(mResID).mutate();
-            d = new InsetDrawable(d, .2f);
-            float inset = getExtraInsetFraction() / (1 + 2 * getExtraInsetFraction());
-            Drawable fg = new InsetDrawable(d, inset);
-            return fg;
         }
     }
 }
